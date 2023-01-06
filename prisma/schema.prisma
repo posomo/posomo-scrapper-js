@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Restaurant {
+  id                 String                        @id @db.Uuid
+  originalId         String
+  name               String                        @db.VarChar(20)
+  category           Category                      @relation(references: [id], fields: [categoryId])
+  categoryId         String                        @db.Uuid
+  titleImageUrl      String                        @db.VarChar(100)
+  createdAt          DateTime                      @default(now())
+  upDateTimedAt      DateTime                      @default(now())
+  location           RestaurantLocation?
+  mainMenuPriceRange RestaurantMainMenuPriceRange?
+  openTimes          RestaurantOpenTime[]
+  breakTimes         RestaurantBreakTime[]
+  lastOrderTimes     RestaurantLastOrder[]
+  menus              RestaurantMenu[]
+  mainMenus          RestaurantMainMenu[]
+}
+
+model RestaurantLocation {
+  id           String     @id @db.Uuid
+  restaurant   Restaurant @relation(references: [id], fields: [restaurantId], onDelete: Cascade)
+  restaurantId String     @db.Uuid @unique
+  roadAddress  String     @db.VarChar(200)
+  latitude     Decimal
+  longitude    Decimal
+}
+
+model Category {
+  id          String       @id @db.Uuid
+  name        String       @db.VarChar(20)
+  restaurants Restaurant[]
+}
+
+model RestaurantMenu {
+  id           String              @id @db.Uuid
+  restaurant   Restaurant          @relation(references: [id], fields: [restaurantId])
+  restaurantId String              @db.Uuid
+  name         String              @db.VarChar(20)
+  price        Int
+  pictureUrl   String              @db.VarChar(300)
+  isMainMenu   RestaurantMainMenu?
+}
+
+model RestaurantMainMenu {
+  id           String         @id @db.Uuid
+  restaurant   Restaurant     @relation(references: [id], fields: [restaurantId])
+  restaurantId String         @db.Uuid
+  menu         RestaurantMenu @relation(references: [id], fields: [menuId])
+  menuId       String         @db.Uuid @unique
+}
+
+model RestaurantMainMenuPriceRange {
+  id           String     @id @db.Uuid
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurantId String     @db.Uuid @unique
+  from         Int
+  to           Int
+}
+
+model RestaurantOpenTime {
+  id           String     @id @db.Uuid
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurantId String     @db.Uuid @unique
+  day          Day
+  from         DateTime   @db.Time()
+  to           DateTime   @db.Time()
+}
+
+model RestaurantBreakTime {
+  id           String                   @id @db.Uuid
+  restaurant   Restaurant               @relation(fields: [restaurantId], references: [id])
+  restaurantId String                   @db.Uuid @unique
+  days         RestaurantBreakTimeDay[]
+  from         DateTime                 @db.Time()
+  to           DateTime                 @db.Time()
+}
+
+model RestaurantBreakTimeDay {
+  id          String              @id @db.Uuid
+  breakTimeId String              @db.Uuid
+  breakTime   RestaurantBreakTime @relation(references: [id], fields: [breakTimeId], onDelete: Cascade)
+}
+
+model RestaurantLastOrder {
+  id           String     @id @db.Uuid
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String     @db.Uuid
+  day          DateTime   @db.Date
+  time         DateTime   @db.Time()
+}
+
+enum Day {
+  MON
+  TUE
+  WED
+  THU
+  FRI
+  SAT
+  SUN
+}
