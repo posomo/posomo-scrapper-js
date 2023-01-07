@@ -25,7 +25,6 @@ model Restaurant {
   breakTimes         RestaurantBreakTime[]
   lastOrderTimes     RestaurantLastOrder[]
   menus              RestaurantMenu[]
-  mainMenus          RestaurantMainMenu[]
 }
 
 model RestaurantLocation {
@@ -54,11 +53,8 @@ model RestaurantMenu {
 }
 
 model RestaurantMainMenu {
-  id           String         @id @db.Uuid
-  restaurant   Restaurant     @relation(references: [id], fields: [restaurantId])
-  restaurantId String         @db.Uuid
-  menu         RestaurantMenu @relation(references: [id], fields: [menuId])
-  menuId       String         @db.Uuid @unique
+  menu RestaurantMenu @relation(references: [id], fields: [id])
+  id   String         @id @db.Uuid @unique
 }
 
 model RestaurantMainMenuPriceRange {
