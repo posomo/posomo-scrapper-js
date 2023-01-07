@@ -18,7 +18,7 @@ model Restaurant {
   categoryId         String                        @db.Uuid
   titleImageUrl      String                        @db.VarChar(100)
   createdAt          DateTime                      @default(now())
-  upDateTimedAt      DateTime                      @default(now())
+  updatedAt      DateTime                      @default(now())
   location           RestaurantLocation?
   mainMenuPriceRange RestaurantMainMenuPriceRange?
   openTimes          RestaurantOpenTime[]
